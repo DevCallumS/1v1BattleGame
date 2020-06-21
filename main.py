@@ -58,16 +58,27 @@ class player(object):
 def redrawGameWindow():
     win.blit(backGround, (0, 0))
     plrOne.draw(win)
+    plrTwo.draw(win)
     drawText()
     pygame.display.update()
 
 def drawText():
-    win.blit(healthFont.render("Player One", True, (0, 0, 0)), (5, 5)) # font.render("...") = text | False = Sharpness (True = sharp, False = not sharp) | (0, 0, 0) = Color | (0, 0 )= position
-    test = win.blit(healthFont.render(f"Health: {str(plrOne.health)}", True, (0, 0, 0)), (5, 41))
+    win.blit(healthFont.render("Player One", True, (0, 0, 0)), (10, 5)) # font.render("...") = text | False = Sharpness (True = sharp, False = not sharp) | (0, 0, 0) = Color | (0, 0 )= position
+    test = win.blit(healthFont.render(f"Health: {str(plrOne.health)}", True, (0, 0, 0)), (10, 41))
+    test = win.blit(healthFont.render("Player Two", True, (0, 0, 0)), (365, 5))
+    test = win.blit(healthFont.render(f"Health: {str(plrTwo.health)}", True, (0, 0, 0)), (365, 41))
+
 
 
 
 plrOne = player(36, 219, 64, 64, (0, 255, 0))
+plrTwo = player(370, 219, 64, 64, (255, 0, 0))
+
+plrOne.health = 8
+plrTwo.health = 4
+
+plr1Bullets = []
+plr2Bullets = []
 
 
 while run:
@@ -77,6 +88,9 @@ while run:
         if event.type == pygame.QUIT:
             run = False
             break
+
+    for bullet in plr1Bullets:
+        
     
     keys = pygame.key.get_pressed()
 
@@ -106,7 +120,34 @@ while run:
             plrOne.isJump = False
             plrOne.jumpCount = 8
 
+    if keys[pygame.K_LEFT] and plrTwo.x > plrTwo.velocity:
+        plrTwo.x -= plrTwo.velocity
+        plrTwo.left = True
+        plrTwo.right = False
+    elif keys[pygame.K_RIGHT] and plrTwo.x < WIDTH - plrTwo.width - plrTwo.velocity:
+        plrTwo.x += plrTwo.velocity
+        plrTwo.left = False
+        plrTwo.right = True
 
+    if not(plrTwo.isJump):
+        if keys[pygame.K_UP]:
+            plrTwo.isJump = True
+            plrTwo.right = False
+            plrTwo.left = False
+            plrTwo.walkCount = 0
+    else:
+        if plrTwo.jumpCount >= -8:
+            neg = 1
+            if plrTwo.jumpCount < 0:
+                neg = -1
+            plrTwo.y -= int((plrTwo.jumpCount ** 2) / 1 * neg)
+            plrTwo.jumpCount -= 1
+        else:
+            plrTwo.isJump = False
+            plrTwo.jumpCount = 8
+
+    if keys[pygame.K_s] and len(plr1Bullets) < 5:
+        plr1Bullets.append()
 
     redrawGameWindow()
 
