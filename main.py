@@ -22,6 +22,10 @@ HEIGHT = 500
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("1v1 Local Player")
 
+# LOAD IMAGES
+
+backGround = pygame.image.load(os.path.join("Assets", "bg.png"))
+
 # END OF WINDOW SETUP
 
 class playerOne(object):
@@ -43,8 +47,8 @@ class playerOne(object):
 
 
 def redrawGameWindow():
+    win.blit(backGround, (0, 0))
     plrOne.draw(win)
-    win.fill((0,0,0))
     pygame.display.update()
 
 
