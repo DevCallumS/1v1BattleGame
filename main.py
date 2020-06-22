@@ -37,10 +37,6 @@ plrOne = player(36, 219, 64, 64, (0, 255, 0))
 plrTwo = player(370, 219, 64, 64, (255, 0, 0))
 
 
-plrOne.health = 8
-plrTwo.health = 4
-
-
 plr1Bullets = []
 plr2Bullets = []
 
