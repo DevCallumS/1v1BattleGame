@@ -9,6 +9,7 @@
 
 import pygame
 import os
+from player import player
 
 pygame.init()
 pygame.font.init()
@@ -30,29 +31,6 @@ backGround = pygame.image.load(os.path.join("Assets", "bg.png"))
 
 # END OF WINDOW SETUP
 
-class player(object):
-    def __init__(self, x, y, width, height, color):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.velocity = 5
-        self.isJump = False
-        self.jumpCount = 8
-        self.left = False
-        self.right = False
-        self.color = color
-        self.health = 10
-
-
-    def draw(self, win):
-        if self.health <= 0:
-            print("Lost")
-
-        # if self.left:
-            
-        # else: 
-        pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
 
 
 def redrawGameWindow():
@@ -88,9 +66,6 @@ while run:
         if event.type == pygame.QUIT:
             run = False
             break
-
-    for bullet in plr1Bullets:
-        
     
     keys = pygame.key.get_pressed()
 
@@ -150,9 +125,5 @@ while run:
         plr1Bullets.append()
 
     redrawGameWindow()
-
-
-
-    
 
 pygame.quit()
