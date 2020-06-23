@@ -28,5 +28,3 @@ class player(object):
     
     def hit(self):
         self.health -= 1
-        if self.health <= 0:
-            print("Killed")

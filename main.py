@@ -18,6 +18,7 @@ pygame.font.init()
 clock = pygame.time.Clock()
 
 run = True
+gamePaused = False
 
 # WINDOW SETUP
 
@@ -42,6 +43,7 @@ plr2Bullets = []
 
 shootCoolDown1 = 0
 shootCoolDown2 = 0
+pauseCoolDown = 0
 
 def redrawGameWindow():
     win.blit(backGround, (0, 0))
@@ -54,6 +56,15 @@ def redrawGameWindow():
 
     for bullet in plr2Bullets:
         bullet.draw(win)
+
+    if plrOne.health <= 0:
+        if not(gamePaused):
+            gamePaused = True
+            print("Killed 1")
+    if plrTwo.health <= 0:
+        if not(gamePaused):
+            gamePaused = True
+            print("Killed 2")
 
     pygame.display.update()
 
@@ -83,136 +94,147 @@ def isInHitBoxX2(bullet):
 while run:
     clock.tick(27)
 
-    if shootCoolDown1 > 0:
-        shootCoolDown1 += 1
-    if shootCoolDown1 > 30:
-        shootCoolDown1 = 0
+    if not(gamePaused):
+        if shootCoolDown1 > 0:
+            shootCoolDown1 += 1
+        if shootCoolDown1 > 30:
+            shootCoolDown1 = 0
 
-    if shootCoolDown2 > 0:
-        shootCoolDown2 += 1
-    if shootCoolDown2 > 30:
-        shootCoolDown2 = 0
+        if shootCoolDown2 > 0:
+            shootCoolDown2 += 1
+        if shootCoolDown2 > 15:
+            shootCoolDown2 = 0
+
+    if pauseCoolDown > 0:
+        pauseCoolDown += 1
+    if pauseCoolDown > 3:
+        pauseCoolDown = 0
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
             break
 
-
-    for bullet in plr1Bullets:
-        if isInHitBoxX1(bullet) and isInHitBoxY1(bullet):
-            plrTwo.hit()
-            plr1Bullets.pop(plr1Bullets.index(bullet))
-        
-        if bullet.x < 500 and bullet.x > 0:
-            bullet.x += bullet.vel
-        else:
-            plr1Bullets.pop(plr1Bullets.index(bullet))
-
-
-    for bullet in plr2Bullets:
-        if isInHitBoxX2(bullet) and isInHitBoxY2(bullet):
-            plrOne.hit()
-            plr2Bullets.pop(plr2Bullets.index(bullet))
-
-        if bullet.x < 500 and bullet.x > 0:
-            bullet.x += bullet.vel
-        else:
-            plr2Bullets.pop(plr2Bullets.index(bullet))
-    
-
     keys = pygame.key.get_pressed()
 
+    if keys[pygame.K_SPACE] and pauseCoolDown == 0:
+        if gamePaused:
+            gamePaused = False
+        else:
+            gamePaused = True
 
-    # Player 1 Movement
+    if not(gamePaused):
+        for bullet in plr1Bullets:
+            if isInHitBoxX1(bullet) and isInHitBoxY1(bullet):
+                plrTwo.hit()
+                plr1Bullets.pop(plr1Bullets.index(bullet))
+            
+            if bullet.x < 500 and bullet.x > 0:
+                bullet.x += bullet.vel
+            else:
+                plr1Bullets.pop(plr1Bullets.index(bullet))
 
 
-    if keys[pygame.K_a] and plrOne.x > plrOne.velocity:
-        plrOne.x -= plrOne.velocity
-        plrOne.left = True
-        plrOne.right = False
-    elif keys[pygame.K_d] and plrOne.x < WIDTH - plrOne.width - plrOne.velocity:
-        plrOne.x += plrOne.velocity
-        plrOne.left = False
-        plrOne.right = True
+        for bullet in plr2Bullets:
+            if isInHitBoxX2(bullet) and isInHitBoxY2(bullet):
+                plrOne.hit()
+                plr2Bullets.pop(plr2Bullets.index(bullet))
 
-    if not(plrOne.isJump):
-        if keys[pygame.K_w]:
-            plrOne.isJump = True
+            if bullet.x < 500 and bullet.x > 0:
+                bullet.x += bullet.vel
+            else:
+                plr2Bullets.pop(plr2Bullets.index(bullet))
+
+
+        # Player 1 Movement
+
+
+        if keys[pygame.K_a] and plrOne.x > plrOne.velocity:
+            plrOne.x -= plrOne.velocity
+            plrOne.left = True
             plrOne.right = False
+        elif keys[pygame.K_d] and plrOne.x < WIDTH - plrOne.width - plrOne.velocity:
+            plrOne.x += plrOne.velocity
             plrOne.left = False
-            plrOne.walkCount = 0
-    else:
-        if plrOne.jumpCount >= -8:
-            neg = 1
-            if plrOne.jumpCount < 0:
-                neg = -1
-            plrOne.y -= int((plrOne.jumpCount ** 2) / 1 * neg)
-            plrOne.jumpCount -= 1
+            plrOne.right = True
+
+        if not(plrOne.isJump):
+            if keys[pygame.K_w]:
+                plrOne.isJump = True
+                plrOne.right = False
+                plrOne.left = False
+                plrOne.walkCount = 0
         else:
-            plrOne.isJump = False
-            plrOne.jumpCount = 8
+            if plrOne.jumpCount >= -8:
+                neg = 1
+                if plrOne.jumpCount < 0:
+                    neg = -1
+                plrOne.y -= int((plrOne.jumpCount ** 2) / 1 * neg)
+                plrOne.jumpCount -= 1
+            else:
+                plrOne.isJump = False
+                plrOne.jumpCount = 8
 
 
-    # Player 2 Movement
+        # Player 2 Movement
 
 
-    if keys[pygame.K_LEFT] and plrTwo.x > plrTwo.velocity:
-        plrTwo.x -= plrTwo.velocity
-        plrTwo.left = True
-        plrTwo.right = False
-    elif keys[pygame.K_RIGHT] and plrTwo.x < WIDTH - plrTwo.width - plrTwo.velocity:
-        plrTwo.x += plrTwo.velocity
-        plrTwo.left = False
-        plrTwo.right = True
-
-    if not(plrTwo.isJump):
-        if keys[pygame.K_UP]:
-            plrTwo.isJump = True
+        if keys[pygame.K_LEFT] and plrTwo.x > plrTwo.velocity:
+            plrTwo.x -= plrTwo.velocity
+            plrTwo.left = True
             plrTwo.right = False
+        elif keys[pygame.K_RIGHT] and plrTwo.x < WIDTH - plrTwo.width - plrTwo.velocity:
+            plrTwo.x += plrTwo.velocity
             plrTwo.left = False
-            plrTwo.walkCount = 0
-    else:
-        if plrTwo.jumpCount >= -8:
-            neg = 1
-            if plrTwo.jumpCount < 0:
-                neg = -1
-            plrTwo.y -= int((plrTwo.jumpCount ** 2) / 1 * neg)
-            plrTwo.jumpCount -= 1
+            plrTwo.right = True
+
+        if not(plrTwo.isJump):
+            if keys[pygame.K_UP]:
+                plrTwo.isJump = True
+                plrTwo.right = False
+                plrTwo.left = False
+                plrTwo.walkCount = 0
         else:
-            plrTwo.isJump = False
-            plrTwo.jumpCount = 8
+            if plrTwo.jumpCount >= -8:
+                neg = 1
+                if plrTwo.jumpCount < 0:
+                    neg = -1
+                plrTwo.y -= int((plrTwo.jumpCount ** 2) / 1 * neg)
+                plrTwo.jumpCount -= 1
+            else:
+                plrTwo.isJump = False
+                plrTwo.jumpCount = 8
 
 
-    # Player 1 Shooting
+        # Player 1 Shooting
 
 
-    if keys[pygame.K_s] and shootCoolDown1 == 0:
-        if plrOne.left:
-            facing = -1
-        else:
-            facing = 1
+        if keys[pygame.K_s] and shootCoolDown1 == 0:
+            if plrOne.left:
+                facing = -1
+            else:
+                facing = 1
 
-        if len(plr1Bullets) < 5:
-            plr1Bullets.append(projectile(round(plrOne.x + plrOne.width //2), round(plrOne.y + plrOne.height //2), 6, plrOne.color, facing))
+            if len(plr1Bullets) < 5:
+                plr1Bullets.append(projectile(round(plrOne.x + plrOne.width //2), round(plrOne.y + plrOne.height //2), 6, plrOne.color, facing))
 
-        shootCoolDown1 = 1
-
-
-
-    # Player 2 Shooting
+            shootCoolDown1 = 1
 
 
-    if keys[pygame.K_DOWN] and shootCoolDown2 == 0:
-        if plrTwo.left:
-            facing = -1
-        else:
-            facing = 1
 
-        if len(plr2Bullets) < 5:
-            plr2Bullets.append(projectile(round(plrTwo.x + plrTwo.width //2), round(plrTwo.y + plrTwo.height //2), 6, plrTwo.color, facing))
+        # Player 2 Shooting
 
-        shootCoolDown2 = 1
+
+        if keys[pygame.K_DOWN] and shootCoolDown2 == 0:
+            if plrTwo.left:
+                facing = -1
+            else:
+                facing = 1
+
+            if len(plr2Bullets) < 5:
+                plr2Bullets.append(projectile(round(plrTwo.x + plrTwo.width //2), round(plrTwo.y + plrTwo.height //2), 6, plrTwo.color, facing))
+
+            shootCoolDown2 = 1
 
 
     redrawGameWindow()
